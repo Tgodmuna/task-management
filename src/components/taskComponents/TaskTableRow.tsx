@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, Calendar, Tag, MoreVertical } from "lucide-react";
+import { Calendar, Tag, MoreVertical } from "lucide-react";
 import type { TaskType } from "../../types";
 
 const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
@@ -10,16 +10,16 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
       {tasks.map((task, index) => (
         <tr
           key={index}
-          className="border-t relative">
-          <td className="p-2 flex items-center gap-2">
-            <Tag className="w-4 h-4 text-gray-500" /> {task.taskName}
+          className="border-t hover:bg-gray-50">
+          <td className="p-3 flex items-center gap-2">
+            <Tag className="w-4 h-4 text-neutral-300" /> {task.taskName}
           </td>
-          <td className="p-2">{task.description}</td>
-          <td className="p-2 flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-gray-500" /> {task.estimation}
+          <td className="p-3">{task.description}</td>
+          <td className="p-3 flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-neutral-300" /> {task.estimation}
           </td>
-          <td className="p-2">{task.type}</td>
-          <td className="p-2 flex gap-2">
+          <td className="p-3">{task.type}</td>
+          <td className="p-3 flex gap-2">
             {task.people && task.people.length !== 0
               ? task.people.map((person, i) => (
                   <span
@@ -30,7 +30,7 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
                 ))
               : null}
           </td>
-          <td className="p-2">
+          <td className="p-3">
             <span
               className={`px-2 py-1 rounded-full text-sm ${
                 task.priority === "High"
@@ -42,9 +42,9 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
               {task.priority}
             </span>
           </td>
-          <td className="p-2 relative">
+          <td className="p-3 relative">
             <button onClick={() => setOpenDropdown(openDropdown === index ? null : index)}>
-              <MoreVertical className="w-4 h-4 text-gray-500" />
+              <MoreVertical className="w-4 h-4 text-neutral-300" />
             </button>
             {openDropdown === index && (
               <div className="absolute right-0 mt-2 w-32 bg-white shadow-md rounded-md z-10">
