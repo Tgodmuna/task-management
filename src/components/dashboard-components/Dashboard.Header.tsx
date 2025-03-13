@@ -44,7 +44,7 @@ const LeftSide: React.FC<{
 };
 const RightSide: React.FC = () => {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col gap-5 items-center">
       {/* Avatars & Invite */}
       <div className="flex  self-end  -space-x-2">
         {["/avatar1.jpg", "/avatar2.jpg", "/avatar3.jpg"].map((src, index) => (
@@ -81,7 +81,7 @@ const RightSide: React.FC = () => {
         </button>
 
         {/* New Task Button */}
-        <button className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">
+        <button className="flex items-center gap-1 bg-neutral-600 text-white px-3 py-1 rounded-md hover:bg-neutral-800">
           <Plus className="w-5 h-5" /> New Task
         </button>
       </div>
