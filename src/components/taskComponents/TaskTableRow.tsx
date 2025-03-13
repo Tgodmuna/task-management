@@ -1,13 +1,16 @@
-import { Tag, Calendar } from "lucide-react";
+import { useState } from "react";
+import { Users, Calendar, Tag, MoreVertical } from "lucide-react";
 import type { TaskType } from "../../types";
 
 const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
+  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+
   return (
     <tbody>
       {tasks.map((task, index) => (
         <tr
           key={index}
-          className="border-t">
+          className="border-t relative">
           <td className="p-2 flex items-center gap-2">
             <Tag className="w-4 h-4 text-gray-500" /> {task.taskName}
           </td>
@@ -38,6 +41,17 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
               }`}>
               {task.priority}
             </span>
+          </td>
+          <td className="p-2 relative">
+            <button onClick={() => setOpenDropdown(openDropdown === index ? null : index)}>
+              <MoreVertical className="w-4 h-4 text-gray-500" />
+            </button>
+            {openDropdown === index && (
+              <div className="absolute right-0 mt-2 w-32 bg-white shadow-md rounded-md z-10">
+                <button className="w-full text-left px-4 py-2 hover:bg-gray-100">Edit</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-gray-100">Delete</button>
+              </div>
+            )}
           </td>
         </tr>
       ))}
