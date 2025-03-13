@@ -1,25 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import type { AppContextType } from "./types";
+import { Route, Routes } from "react-router-dom";
+import Dashboard from "./components/dashboard-components/Dashboard";
+import LoginForm from "./components/auth/Login";
+import { ToastContainer } from "react-toastify";
+import RegisterForm from "./components/auth/Register";
+//AppContext
+export const AppContext = React.createContext<null | AppContextType>(null);
 
 function App() {
+  const [isloggedIn, SetIsloggedIn] = useState<boolean>(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContext.Provider value={{ isloggedIn, SetIsloggedIn }}>
+      <div className="App">
+        <ToastContainer />
+
+        <Routes>
+          {/* dashboard */}
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
+          />
+
+          {/* auth */}
+          <Route
+            path="/login"
+            element={<LoginForm />}
+          />  <Route
+            path="/register"
+            element={<RegisterForm />}
+          />
+        </Routes>
+      </div>
+    </AppContext.Provider>
   );
 }
 
