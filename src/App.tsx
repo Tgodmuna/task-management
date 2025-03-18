@@ -55,12 +55,14 @@ function App() {
         }
         console.log(response);
         setTasks(response.data?.tasks);
-      } catch (error) {
-        console.log(error);
+      } catch (err) {
+        console.log(err);
         toast.error(
-          `${(error as any)?.response?.data || (error as Error)?.message} || ${
-            (error as any).code
-          }` || "failed to fetch tasks.  Please try again."
+          `${
+            (err as any)?.response?.data ||
+            (err as any)?.response?.data?.error ||
+            (err as Error)?.message
+          } || ${(err as any).code}` || "failed to fetch tasks.  Please try again."
         );
       }
     }
