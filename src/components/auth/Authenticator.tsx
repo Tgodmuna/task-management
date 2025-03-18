@@ -11,13 +11,14 @@ const Authenticator: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     if (!token) {
-      console.log("No token found, redirecting...");
+      appContext?.toggleLogin(false);
       setIsAuthenticated(false);
       setTimeout(() => {
         navigate("/login", { replace: true });
       }, 2000);
     } else {
       setIsAuthenticated(true);
+      appContext?.toggleLogin(true);
     }
   }, [token, navigate, appContext]);
 
