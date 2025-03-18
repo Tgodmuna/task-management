@@ -1,8 +1,22 @@
 import {} from "./components/taskComponents/Task";
 
 export interface AppContextType {
+  isAddTaskOpen: boolean;
+  onCreateTask: () => void;
   isloggedIn: boolean;
-  SetIsloggedIn: (value: boolean) => void;
+  toggleLogin: (data: boolean) => void;
+  setUserData: React.Dispatch<React.SetStateAction<userType | null>>;
+  userData: userType | null;
+  tasks: TaskType[] | [];
+  setTasks: React.Dispatch<React.SetStateAction<TaskType[] | []>>;
+}
+
+export interface userType {
+  name: string;
+  email: string;
+  password: string;
+  tasks: TaskType[];
+  profileUrl: string | undefined;
 }
 
 export interface TaskType {
@@ -11,13 +25,17 @@ export interface TaskType {
   estimation: string;
   type: string;
   priority: string;
-  people?: string[];
-  status?: "to-do" | "in progress" | "completed";
+  people?: userType[];
+  status?: string;
+  _id?: string;
 }
+
+export type newTaskType = Omit<TaskType, "people"> & {
+  people: string[];
+};
 
 export interface TaskHeaderPropType {
   tasks: TaskType[];
-  onAddTask?: () => void;
   title: string;
   dropdownContext: boolean;
   setter: string;
@@ -26,8 +44,6 @@ export interface TaskHeaderPropType {
 export type TaskContextType = {
   tasks: TaskType[];
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
-  setIsAddTaskOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  isAddTaskOpen?: boolean;
   isTaskListDropdownOpen: boolean;
   inProgressTaskList: boolean;
   completedTaskList: boolean;
