@@ -17,6 +17,7 @@ export interface userType {
   password: string;
   tasks: TaskType[];
   profileUrl: string | undefined;
+  _id: string;
 }
 
 export interface TaskType {
