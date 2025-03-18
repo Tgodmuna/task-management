@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import React from "react";
 
 const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
-  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const taskContext = useContext(TaskContext);
   const { serverUrl } = useEnvironmentUrls();
   const editContentRef = useRef<null | HTMLButtonElement>(null);
@@ -16,18 +16,12 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
 
   //delete handler
   async function deleteTask(id: string) {
-    taskContext?.setTasks((prevTasks) => {
-      return prevTasks.filter((task) => task._id !== id);
-    });
+    taskContext?.setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
 
-    //make a call to the server
     try {
       const response = await axios.delete(`${serverUrl}/api/task/delete/${id}`);
-      if (response.status === 200) {
-        return toast.success("deleted successfully");
-      }
-
-      if (response.status !== 200) return toast.info(response.data);
+      if (response.status === 200) return toast.success("Deleted successfully");
+      toast.info(response.data);
     } catch (error) {
       console.log(error);
       toast.error((error as Error).message);
@@ -36,21 +30,16 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
 
   //edit task handler
   async function editContent(id: string) {
-    let text = editContentRef.current && editContentRef.current?.innerHTML;
-
+    let text = editContentRef.current?.innerHTML || "";
     const task = tasks.find((task) => task._id === id);
     if (task) {
-      task.description = text ?? "";
+      task.description = text;
       taskContext?.setTasks((prevState) => [...prevState, task]);
     }
-    //make a call to server
+
     try {
       const response = await axios.patch(`${serverUrl}/api/task/${id}`, { description: text });
-
-      if (response.status === 200) {
-        toast.success("your task was edited successfully");
-        console.log(response);
-      }
+      if (response.status === 200) toast.success("Task edited successfully");
     } catch (error) {
       console.log(error);
       toast.error((error as Error).message);
@@ -60,23 +49,17 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
   //edit status handler
   async function editStatus(id: string, i: number) {
     const task = tasks.find((task) => task._id === id);
-
     let options = editContentRef.current?.children;
-    let text = options && options[i].innerHTML;
+    let text = options && options[i]?.innerHTML;
 
     if (task && text) {
       task.status = text;
       taskContext?.setTasks((prevState) => [...prevState, task]);
     }
 
-    //make a call to server
     try {
-      const response = await axios.patch(`${serverUrl}/api/task/${id}`, { description: text });
-
-      if (response.status === 200) {
-        toast.success("your task was edited successfully");
-        console.log(response);
-      }
+      const response = await axios.patch(`${serverUrl}/api/task/${id}`, { status: text });
+      if (response.status === 200) toast.success("Status updated successfully");
     } catch (error) {
       console.log(error);
       toast.error((error as Error).message);
@@ -85,9 +68,9 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
 
   return (
     <tbody>
-      {tasks.map((task, index) => (
+      {tasks.map((task) => (
         <tr
-          key={index}
+          key={task._id}
           className="border-t hover:bg-gray-50">
           <td className="p-3 flex items-center gap-2">
             <Tag className="w-4 h-4 text-neutral-300" /> {task.taskName}
@@ -98,16 +81,21 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
           </td>
           <td className="p-3">{task.type}</td>
           <td className="p-3 flex gap-2">
-            {task.people && task.people.length !== 0 ? (
-              task.people.map((person, i) => (
+            {task.people && task.people.length > 0 ? (
+              task.people.map((person) => (
                 <img
-                  className={`size-4 rounded-full p-2 gap-2`}
-                  src={`https://${serverUrl}/${person.profileUrl}`}
-                  alt={`${person.name}-1`}
+                  key={person._id}
+                  className="size-6 rounded-full border border-gray-200 shadow-sm"
+                  src={
+                    person.profileUrl
+                      ? `https://${serverUrl}/${person.profileUrl}`
+                      : "/default-avatar.png"
+                  }
+                  alt={person.name}
                 />
               ))
             ) : (
-              <User className={"size-1 p-2 bg-green-300"} />
+              <User className="size-6 p-2 bg-gray-300 rounded-full" />
             )}
           </td>
           <td className="p-3">
@@ -122,59 +110,34 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
               {task.priority}
             </span>
           </td>
+          <td className="p-3">
+            <span
+              className={`px-2 py-1 rounded-full text-sm ${
+                task.status === "Completed"
+                  ? "bg-green-200 text-green-700"
+                  : task.status === "In Progress"
+                  ? "bg-yellow-200 text-yellow-700"
+                  : "bg-gray-200 text-gray-700"
+              }`}>
+              {task.status}
+            </span>
+          </td>
           <td className="p-3 relative">
-            <button onClick={() => setOpenDropdown(openDropdown === index ? null : index)}>
+            <button onClick={() => setOpenDropdown(openDropdown === task._id ? null : task._id || null)}>
               <MoreVertical className="w-4 h-4 text-neutral-300" />
             </button>
-            {openDropdown === index && (
+            {openDropdown === task._id && (
               <div className="absolute right-0 mt-2 w-32 bg-white shadow-md rounded-md z-10">
                 <button
                   ref={editContentRef}
-                  onClick={() => editContent(task._id as string)}
+                  onClick={() => task._id && editContent(task._id)}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100">
                   Edit
                 </button>
-
                 <button
                   onClick={async () => task._id && (await deleteTask(task._id))}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100">
                   Delete
-                </button>
-
-                <button className="w-full flex flex-col text-left px-4 py-2 hover:bg-gray-100">
-                  <select
-                    ref={editStatusRef}
-                    name="change status"
-                    id="CS"
-                    disabled={true}>
-                    <option
-                      className={`text-neutral-400 text-center`}
-                      value=""
-                      disabled={true}>
-                      change-status
-                    </option>
-
-                    <option
-                      onClick={async () => task._id && (await editStatus(task._id, 1))}
-                      className={`capitalize hover:bg-gray-200 cursor-pointer `}
-                      value="to-do">
-                      Todo
-                    </option>
-
-                    <option
-                      onClick={async () => task._id && (await editStatus(task._id, 2))}
-                      className={`capitalize hover:bg-gray-200 cursor-pointer `}
-                      value="in progress">
-                      in-progress
-                    </option>
-
-                    <option
-                      onClick={async () => task._id && (await editStatus(task._id, 3))}
-                      className={`capitalize hover:bg-gray-200 cursor-pointer `}
-                      value="completed">
-                      completed
-                    </option>
-                  </select>
                 </button>
               </div>
             )}
