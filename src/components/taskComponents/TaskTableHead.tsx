@@ -8,6 +8,7 @@ const TableHeader = () => {
         <th className="p-2">Type</th>
         <th className="p-2">People</th>
         <th className="p-2">Priority</th>
+        <th className="p-2">status</th>
       </tr>
     </thead>
   );
