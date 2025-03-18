@@ -1,8 +1,10 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useContext } from "react";
 import { AlertCircle, Loader2, Lock, Mail } from "lucide-react";
 import axios from "axios";
 import useEnvironmentUrls from "../hooks/UseEnvironmentVar";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { AppContext } from "../../App";
 
 export default function LoginForm() {
   const [email, setEmail] = useState<string>("");
@@ -11,31 +13,44 @@ export default function LoginForm() {
   const [error, setError] = useState<string>("");
   const { serverUrl } = useEnvironmentUrls();
   const navigate = useNavigate();
+  const appContext = useContext(AppContext);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    //validate data
-    if (!email || !password) {
-      setError("Please fill in all fields");
+    try {
+      //validate data
+      if (!email || !password) {
+        setError("Please fill in all fields");
+        setLoading(false);
+        return;
+      }
+      const response = await axios.post(`${serverUrl}/api/auth/login`, {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        toast.success("authenticated successfully");
+
+        sessionStorage.setItem("user", JSON.stringify(response.data.user));
+        sessionStorage.setItem("token", response.data.token);
+
+        //navigate to dashboard
+        setTimeout(() => navigate("/dashboard", { replace: true }), 1000);
+
+        //toggle login state
+        appContext?.toggleLogin(true);
+      }
       setLoading(false);
-      return;
-    }
-    const response = await axios.post(`${serverUrl}/api/auth/login`, {
-      email,
-      password,
-    });
+    } catch (error: any) {
+      setLoading(false);
+      toast.error("login failed. Please try again.");
 
-    if (response.status === 200) {
-      console.log(response.data);
-
-      sessionStorage.setItem("user", JSON.stringify(response.data.user));
-      //navigate to dashboard
-      navigate("/dashboard");
+      setError(error?.response?.data.message || error?.message || "An error occurred");
     }
-    setLoading(false);
   };
 
   return (
