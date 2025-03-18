@@ -1,10 +1,12 @@
+import { Task } from "../taskComponents/Task";
 import DashboardHeader from "./Dashboard.Header";
 
 const Dashboard = () => {
   return (
     <div>
-    <DashboardHeader/>
+      <DashboardHeader />
+      <Task/>
     </div>
   )
 }
-export default Dashboard
+export default Dashboard;

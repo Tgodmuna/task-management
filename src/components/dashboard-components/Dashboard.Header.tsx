@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Search, Filter, Plus, User } from "lucide-react";
+import { AppContext } from "../../App";
+import React from "react";
 
 const DashboardHeader = () => {
   const [activeView, setActiveView] = useState("List");
@@ -7,26 +9,35 @@ const DashboardHeader = () => {
   return (
     <header className="flex items-center justify-between p-4 bg-white shadow-md">
       {/* Left Side - Project Title & Navigation */}
-      <LeftSide
-        activeView={activeView}
-        setActiveView={setActiveView}
-      />
+      {
+        <LeftSide
+          activeView={activeView}
+          setActiveView={setActiveView}
+        />
+      }
 
       {/* Right Side - Actions */}
-      <RightSide />
+      {<RightSide />}
     </header>
   );
 };
 
-export default DashboardHeader;
+export default React.memo(DashboardHeader);
 
+// left side
 const LeftSide: React.FC<{
   activeView: string;
   setActiveView: React.Dispatch<React.SetStateAction<string>>;
 }> = ({ activeView, setActiveView }) => {
+  const appContext = useContext(AppContext);
+  const userData = appContext?.userData;
+
   return (
     <div className="flex items-center gap-6">
-      <h1 className="text-xl font-semibold">Craftboard Project</h1>
+      <h1 className="text-xl capitalize font-semibold w-full">
+        welcome to your Dashboard{" "}
+        <span className={`text-xl italic text-neutral-400 uppercase `}>{userData?.name}</span>
+      </h1>
       <nav className="flex gap-4">
         {["Kanban", "Timeline", "List"].map((view) => (
           <button
@@ -42,24 +53,50 @@ const LeftSide: React.FC<{
     </div>
   );
 };
+// right side
 const RightSide: React.FC = () => {
+  const appContext = useContext(AppContext);
+  const tasks = appContext?.tasks;
+  const userData = appContext?.userData;
+
   return (
-    <div className="flex flex-col gap-5 items-center">
-      {/* Avatars & Invite */}
+    <div className="flex  gap-5 items-center">
+      {/* Avatars & Invites */}
       <div className="flex  self-end  -space-x-2">
-        {["/avatar1.jpg", "/avatar2.jpg", "/avatar3.jpg"].map((src, index) => (
-          <img
-            key={index}
-            src={src}
-            alt={`User ${index + 1}`}
-            className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover"
-          />
-        ))}
+        {/* people assigned to a task */}
+
+        {tasks &&
+          tasks.map((task) => {
+            return (
+              task.people &&
+              task.people.length !== 0 &&
+              task.people.map((assignee) =>
+                assignee.profileUrl ? (
+                  <img
+                    src={assignee.profileUrl}
+                    alt={`User ${assignee.name + 1}`}
+                    className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover"
+                  />
+                ) : (
+                  <User className="w-4 h-4  text-orange-600" />
+                )
+              )
+            );
+          })}
+
         {/* Placeholder Avatar */}
         <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 border-2 border-white shadow-sm">
-          <User className="w-4 h-4 text-gray-600" />
+          {userData?.profileUrl ? (
+            <img
+              src={userData.profileUrl}
+              alt={`User ${userData.name + 1}`}
+              className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover"
+            />
+          ) : (
+            <User className="w-4 h-4 text-gray-600" />
+          )}
         </div>
-        <button className="bg-gray-200 text-sm px-3 py-1 rounded-md hover:bg-gray-300">
+        <button className="bg-gray-200  text-sm px-3 py-1 rounded-md hover:bg-gray-300">
           Invite
         </button>
       </div>
@@ -81,7 +118,9 @@ const RightSide: React.FC = () => {
         </button>
 
         {/* New Task Button */}
-        <button className="flex items-center gap-1 bg-neutral-600 text-white px-3 py-1 rounded-md hover:bg-neutral-800">
+        <button
+          onClick={() => appContext?.onCreateTask()}
+          className="flex items-center gap-1 bg-neutral-600 text-white px-3 py-1 rounded-md hover:bg-neutral-800">
           <Plus className="w-5 h-5" /> New Task
         </button>
       </div>
