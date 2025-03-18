@@ -10,11 +10,11 @@ const TaskList: React.FC = () => {
 
   // Filter tasks by status
   const inProgressTasks = useMemo(
-    () => tasks && tasks.filter((task) => task.status === "in progress"),
+    () => tasks && tasks.filter((task) => task.status?.toLowerCase() === "in progress"),
     [tasks]
   );
   const completedTasks = useMemo(
-    () => tasks && tasks.filter((task) => task.status === "completed"),
+    () => tasks && tasks.filter((task) => task.status?.toLowerCase() === "completed"),
     [tasks]
   );
 
