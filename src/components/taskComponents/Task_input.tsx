@@ -1,38 +1,90 @@
 import { useContext, useState } from "react";
-import { Calendar, Users, Tag, AlignLeft, Plus, X } from "lucide-react";
+import { Calendar, Users, Tag, AlignLeft, Plus, X, Loader2 } from "lucide-react";
 import { TaskContext } from "./Task";
-import type { TaskType } from "../../types";
+import type { newTaskType } from "../../types";
+import React from "react";
+import axios from "axios";
+import useEnvironmentUrls from "../hooks/UseEnvironmentVar";
+import { toast } from "react-toastify";
+import { AppContext } from "../../App";
+import { UseFetchToken } from "../hooks/UseFetchToken";
 
 const TaskInput: React.FC = () => {
   const taskContext = useContext(TaskContext);
+  const appContext = useContext(AppContext);
   const [taskName, setTaskName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [estimation, setEstimation] = useState<string>("");
   const [type, setType] = useState<string>("Dashboard");
   const [priority, setPriority] = useState<string>("Medium");
-  const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
-
-  if (!taskContext) return null;
-  const { tasks, setTasks, setIsAddTaskOpen, isAddTaskOpen } = taskContext;
+  const [people, setPeople] = useState<string[]>([]);
+  const { serverUrl } = useEnvironmentUrls();
+  const [loading, Setisloading] = useState<boolean>(false);
+  const token = UseFetchToken();
+  if (!taskContext && !appContext) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newTask: TaskType = {
+    const newTask: newTaskType = {
       taskName,
       description,
       estimation,
       type,
       priority,
-      people: assignedUsers,
+      people,
     };
-    setTasks([...tasks, newTask]);
-    setIsAddTaskOpen(false);
+
+    function validate(data: newTaskType) {
+      const { taskName, description, estimation, type, priority, people } = data;
+
+      if (!taskName && !description && !estimation && !type && !priority && !people) {
+        toast.error("fields are empty");
+        return null;
+      }
+
+      if (!taskName || !description || !estimation || !type || !priority || !people) {
+        toast.error("all fields are required");
+        return null;
+      }
+      return true;
+    }
+
+    if (!validate(newTask)) return;
+
+    Setisloading(true);
+
+    //post to server
+    axios
+      .post(
+        `${serverUrl}/api/task/createTask`,
+        { newTask },
+        {
+          headers: {
+            "x-auth-token": token,
+          },
+        }
+      )
+      .then((res) => {
+        if (res.status === 201) {
+          Setisloading(false);
+          taskContext?.setTasks((prev) => [...prev, res.data.task]);
+          toast.success(res.data.message);
+
+          //close the form
+          appContext?.onCreateTask();
+        }
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message || (err as Error).message || "something went wrong");
+        console.log(err);
+        Setisloading(false);
+      });
   };
 
   return (
     <div
       className={`fixed w-full h-[100vh] inset-0 bg-black bg-opacity-50  items-center justify-center z-50 ${
-        isAddTaskOpen ? "flex" : "hidden"
+        appContext?.isAddTaskOpen ? "flex" : "hidden"
       }`}>
       <form
         onSubmit={handleSubmit}
@@ -41,9 +93,7 @@ const TaskInput: React.FC = () => {
           title={"close"}
           type="button"
           className="absolute top-2 right-2 text-gray-500 hover:bg-neutral-800"
-          onClick={() => {
-            setIsAddTaskOpen(false);
-          }}>
+          onClick={() => appContext?.onCreateTask()}>
           <X className="w-6 h-6" />
         </button>
         <h2 className="text-lg font-semibold mb-4">New Task</h2>
@@ -112,20 +162,32 @@ const TaskInput: React.FC = () => {
               type="text"
               placeholder="Assign Users (comma separated)"
               className="w-full focus:outline-none"
-              onChange={(e) => setAssignedUsers(e.target.value.split(","))}
+              onChange={(e) => setPeople([...people, e.target.value])}
             />
           </div>
         </div>
 
         {/* Submit Button */}
         <button
+          disabled={loading}
           type="submit"
-          className="mt-4 flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-          <Plus className="w-5 h-5" /> Add Task
+          className={`${
+            loading && "cursor-not-allowed bg-slate-500"
+          } mt-4 flex items-center gap-2 bg-blue-600  text-white px-4 py-2 rounded-md hover:bg-blue-700`}>
+          {loading ? (
+            <span className={`flex`}>
+              creating Task <Loader2 className="animate-spin h-5 w-5 mx-auto" />
+            </span>
+          ) : (
+            <span className={`flex`}>
+              <Plus className="w-5 h-5" />
+              add task
+            </span>
+          )}
         </button>
       </form>
     </div>
   );
 };
 
-export default TaskInput;
+export default React.memo(TaskInput);

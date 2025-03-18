@@ -1,21 +1,27 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import TableHeader from "./TaskTableHead";
 import TableRow from "./TaskTableRow";
 import { TaskContext } from "./Task";
 import TaskHeader from "./TaskHeader";
 
-const TaskList: React.FC<{ toggleAddTask: () => void }> = () => {
+const TaskList: React.FC = () => {
   const taskContext = useContext(TaskContext);
   const tasks = taskContext?.tasks;
 
   // Filter tasks by status
-  const inProgressTasks = tasks && tasks.filter((task) => task.status === "in progress");
-  const completedTasks = tasks && tasks.filter((task) => task.status === "completed");
+  const inProgressTasks = useMemo(
+    () => tasks && tasks.filter((task) => task.status === "in progress"),
+    [tasks]
+  );
+  const completedTasks = useMemo(
+    () => tasks && tasks.filter((task) => task.status === "completed"),
+    [tasks]
+  );
 
   //on empty task list
   if (!tasks || tasks.length === 0) {
     return (
-      <div className="bg-white p-4 rounded-lg shadow-md w-full flex flex-col items-center justify-center">
+      <div className="bg-white p-4 rounded-lg  shadow-md h-[100vh] w-full flex flex-col items-center justify-center">
         <h2 className="text-lg font-semibold mb-4">Task List</h2>
         <div className="text-center text-gray-500">
           <svg
@@ -106,4 +112,4 @@ const TaskList: React.FC<{ toggleAddTask: () => void }> = () => {
   );
 };
 
-export default TaskList;
+export default React.memo(TaskList);

@@ -2,15 +2,16 @@ import { useContext } from "react";
 import { ChevronDown, Plus } from "lucide-react";
 import type { TaskContextType, TaskHeaderPropType } from "../../types";
 import { TaskContext } from "./Task";
+import { AppContext } from "../../App";
 
 const TaskHeader: React.FC<TaskHeaderPropType> = ({
   tasks,
-  onAddTask,
   title = "To-do",
   dropdownContext,
   setter,
 }) => {
   const taskContext = useContext(TaskContext) as TaskContextType | null;
+  const appContext = useContext(AppContext);
   const taskCount = tasks.length;
   const toggleDropdown = () => {
     const setterKey = `set${setter}` as keyof TaskContextType;
@@ -38,7 +39,7 @@ const TaskHeader: React.FC<TaskHeaderPropType> = ({
       {/* Add Task Button */}
       <button
         title="Add Task"
-        onClick={onAddTask}
+        onClick={() => appContext?.onCreateTask()}
         className="flex items-center gap-2 text-white px-4 py-2 rounded-md hover:bg-gray-400">
         <Plus className="w-5 h-5" />
       </button>
