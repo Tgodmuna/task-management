@@ -29,7 +29,7 @@ export const Task = () => {
         setCompleteTaskList,
         setInProgressTaskList,
       }}>
-      <TaskList />
+      <TaskList  />
       <TaskInput />
     </TaskContext.Provider>
   );
