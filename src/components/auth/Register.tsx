@@ -5,8 +5,9 @@ import useEnvironmentUrls from "../hooks/UseEnvironmentVar";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import React from "react";
 
-export default function RegisterForm() {
+function RegisterForm() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -37,7 +38,7 @@ export default function RegisterForm() {
         console.log(response.data);
         toast.success("Registration successful! Redirecting to login page.....");
 
-        //navigate to dashboard
+        //navigate to login in some mill seconds
         setTimeout(() => navigate("/login"), 2000);
       }
       setLoading(false);
@@ -121,3 +122,5 @@ export default function RegisterForm() {
     </div>
   );
 }
+
+export default React.memo(RegisterForm);
