@@ -57,7 +57,7 @@ const TaskInput: React.FC = () => {
         );
 
         if (response.status === 201) {
-          taskContext?.setTasks((prev) => [...prev, response.data.task]);
+          appContext?.setTasks((prev) => [...prev, response.data.task]);
           toast.success(response.data.message);
           appContext?.onCreateTask();
         }
@@ -71,7 +71,7 @@ const TaskInput: React.FC = () => {
         setLoading(false);
       }
     },
-    [formData, serverUrl, token, taskContext, appContext]
+    [formData, serverUrl, token, appContext]
   );
   if (!taskContext || !appContext) return null;
 
