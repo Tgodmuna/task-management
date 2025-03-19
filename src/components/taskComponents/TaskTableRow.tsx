@@ -47,18 +47,15 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
   }
 
   //edit status handler
-  async function editStatus(id: string, i: number) {
+  async function editStatus(id: string, status: string) {
     const task = tasks.find((task) => task._id === id);
-    let options = editContentRef.current?.children;
-    let text = options && options[i]?.innerHTML;
-
-    if (task && text) {
-      task.status = text;
+    if (task) {
+      task.status = status;
       taskContext?.setTasks((prevState) => [...prevState, task]);
     }
 
     try {
-      const response = await axios.patch(`${serverUrl}/api/task/${id}`, { status: text });
+      const response = await axios.patch(`${serverUrl}/api/task/${id}`, { status });
       if (response.status === 200) toast.success("Status updated successfully");
     } catch (error) {
       console.log(error);
@@ -123,7 +120,7 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
             </span>
           </td>
           <td className="p-3 relative">
-            <button onClick={() => setOpenDropdown(openDropdown === task._id ? null : task._id || null)}>
+            <button onClick={() => task._id && setOpenDropdown(openDropdown === task._id ? null : task._id)}>
               <MoreVertical className="w-4 h-4 text-neutral-300" />
             </button>
             {openDropdown === task._id && (
@@ -134,6 +131,14 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
                   className="w-full text-left px-4 py-2 hover:bg-gray-100">
                   Edit
                 </button>
+                <select
+                  ref={editStatusRef}
+                  onChange={(e) => task._id && editStatus(task._id, e.target.value)}
+                  className="w-full px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                  <option value="Not Started">Not Started</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
                 <button
                   onClick={async () => task._id && (await deleteTask(task._id))}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100">
