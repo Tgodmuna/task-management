@@ -2,9 +2,14 @@ import { useContext, useState } from "react";
 import { Search, Filter, Plus, User } from "lucide-react";
 import { AppContext } from "../../App";
 import React from "react";
+import type { TaskType, userType } from "../../types";
 
 const DashboardHeader = () => {
   const [activeView, setActiveView] = useState("List");
+  const appContext = useContext(AppContext);
+  const tasks = appContext?.tasks;
+  const userData = appContext?.userData;
+  const toggleAddTask = appContext?.onCreateTask;
 
   return (
     <header className="flex items-center justify-between p-4 bg-white shadow-md">
@@ -17,7 +22,13 @@ const DashboardHeader = () => {
       }
 
       {/* Right Side - Actions */}
-      {<RightSide />}
+      {
+        <RightSide
+          tasks={tasks}
+          userData={userData}
+          toggleAddTask={toggleAddTask}
+        />
+      }
     </header>
   );
 };
@@ -53,16 +64,17 @@ const LeftSide: React.FC<{
     </div>
   );
 };
-// right side
-const RightSide: React.FC = () => {
-  const appContext = useContext(AppContext);
-  const tasks = appContext?.tasks;
-  const userData = appContext?.userData;
 
+// right side
+const RightSide: React.FC<{
+  tasks: [] | TaskType[] | undefined;
+  userData: userType | null | undefined;
+  toggleAddTask: (() => void) | undefined;
+}> = ({ tasks, userData, toggleAddTask }) => {
   return (
     <div className="flex  gap-5 items-center">
       {/* Avatars & Invites */}
-      <div className="flex  self-end  -space-x-2">
+      <div className="flex    w-full h-8 rounded-full p-1 items-center gap-1">
         {/* people assigned to a task */}
 
         {tasks &&
@@ -71,15 +83,19 @@ const RightSide: React.FC = () => {
               task.people &&
               task.people.length !== 0 &&
               task.people.map((assignee) =>
-                assignee.profileUrl ? (
-                  <img
-                    src={assignee.profileUrl}
-                    alt={`User ${assignee.name + 1}`}
-                    className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover"
-                  />
-                ) : (
-                  <User className="w-4 h-4  text-orange-600" />
-                )
+              assignee.profileUrl ? (
+                <img
+                key={assignee.name}
+                src={assignee.profileUrl}
+                alt={`User ${assignee.name}`}
+                className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover"
+                />
+              ) : (
+                <User
+                key={assignee.name}
+                className="w-4 h-4  text-green-300"
+                />
+              )
               )
             );
           })}
@@ -119,9 +135,10 @@ const RightSide: React.FC = () => {
 
         {/* New Task Button */}
         <button
-          onClick={() => appContext?.onCreateTask()}
-          className="flex items-center gap-1 bg-neutral-600 text-white px-3 py-1 rounded-md hover:bg-neutral-800">
-          <Plus className="w-5 h-5" /> New Task
+          onClick={() => toggleAddTask && toggleAddTask()}
+          className="flex  items-center gap-1 bg-neutral-600 text-white w-[7rem] text-sm p-2 rounded-md hover:bg-neutral-800 transition duration-300 ease-in-out transform hover:scale-105">
+          <Plus className="size-5" />
+          New Task
         </button>
       </div>
     </div>
