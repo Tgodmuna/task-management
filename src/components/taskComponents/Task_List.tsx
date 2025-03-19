@@ -3,10 +3,11 @@ import TableHeader from "./TaskTableHead";
 import TableRow from "./TaskTableRow";
 import { TaskContext } from "./Task";
 import TaskHeader from "./TaskHeader";
+import { AppContext } from "../../App";
 
 const TaskList: React.FC = () => {
   const taskContext = useContext(TaskContext);
-  const tasks = taskContext?.tasks;
+  const tasks = useContext(AppContext)?.tasks;
 
   // Filter tasks by status
   const inProgressTasks = useMemo(
@@ -49,7 +50,7 @@ const TaskList: React.FC = () => {
         <div className={`w-full`}>
           <TaskHeader
             title={"todo"}
-            dropdownContext={taskContext?.isTaskListDropdownOpen}
+            dropdownContext={taskContext?.isTaskListDropdownOpen ?? false}
             tasks={tasks}
             setter={"IsTaskListDropdownOpen"}
           />
@@ -70,7 +71,7 @@ const TaskList: React.FC = () => {
         <div className={`w-full`}>
           <TaskHeader
             title={"in-progress"}
-            dropdownContext={taskContext?.inProgressTaskList}
+            dropdownContext={taskContext?.inProgressTaskList ?? false}
             tasks={inProgressTasks}
             setter={"InProgressTaskList"}
           />
@@ -92,7 +93,7 @@ const TaskList: React.FC = () => {
         <div className={`w-full`}>
           <TaskHeader
             tasks={completedTasks}
-            dropdownContext={taskContext?.completedTaskList}
+            dropdownContext={taskContext?.completedTaskList ?? false}
             title={"completed"}
             setter="CompleteTaskList"
           />
