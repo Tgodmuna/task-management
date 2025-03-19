@@ -1,68 +1,25 @@
 import { useContext, useRef, useState } from "react";
 import { Calendar, Tag, MoreVertical, User } from "lucide-react";
 import type { TaskType } from "../../types";
-import { TaskContext } from "./Task";
-import axios from "axios";
 import useEnvironmentUrls from "../hooks/UseEnvironmentVar";
-import { toast } from "react-toastify";
 import React from "react";
+import { AppContext } from "../../App";
 
 const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const taskContext = useContext(TaskContext);
   const { serverUrl } = useEnvironmentUrls();
   const editContentRef = useRef<null | HTMLButtonElement>(null);
   const editStatusRef = useRef<null | HTMLSelectElement>(null);
+  const appContext = useContext(AppContext);
 
-  //delete handler
-  async function deleteTask(id: string) {
-    taskContext?.setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
-
-    try {
-      const response = await axios.delete(`${serverUrl}/api/task/delete/${id}`);
-      if (response.status === 200) return toast.success("Deleted successfully");
-      toast.info(response.data);
-    } catch (error) {
-      console.log(error);
-      toast.error((error as Error).message);
-    }
-  }
-
-  //edit task handler
-  async function editContent(id: string) {
-    let text = editContentRef.current?.innerHTML || "";
-    const task = tasks.find((task) => task._id === id);
+  const editStatus = async (taskId: string, status: string) => {
+    const task = tasks.find( ( task ) => task._id === taskId );
+    console.log({status})
     if (task) {
-      task.description = text;
-      taskContext?.setTasks((prevState) => [...prevState, task]);
+      const updatedTask = { ...task, status };
+      await appContext?.modifyTask(taskId, updatedTask);
     }
-
-    try {
-      const response = await axios.patch(`${serverUrl}/api/task/${id}`, { description: text });
-      if (response.status === 200) toast.success("Task edited successfully");
-    } catch (error) {
-      console.log(error);
-      toast.error((error as Error).message);
-    }
-  }
-
-  //edit status handler
-  async function editStatus(id: string, status: string) {
-    const task = tasks.find((task) => task._id === id);
-    if (task) {
-      task.status = status;
-      taskContext?.setTasks((prevState) => [...prevState, task]);
-    }
-
-    try {
-      const response = await axios.patch(`${serverUrl}/api/task/${id}`, { status });
-      if (response.status === 200) toast.success("Status updated successfully");
-    } catch (error) {
-      console.log(error);
-      toast.error((error as Error).message);
-    }
-  }
-
+  };
   return (
     <tbody>
       {tasks.map((task) => (
@@ -120,14 +77,17 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
             </span>
           </td>
           <td className="p-3 relative">
-            <button onClick={() => task._id && setOpenDropdown(openDropdown === task._id ? null : task._id)}>
+            <button
+              onClick={() =>
+                task._id && setOpenDropdown(openDropdown === task._id ? null : task._id)
+              }>
               <MoreVertical className="w-4 h-4 text-neutral-300" />
             </button>
             {openDropdown === task._id && (
-              <div className="absolute right-0 mt-2 w-32 bg-white shadow-md rounded-md z-10">
+              <div className="absolute right-0 mt-2 w-32 bg-gray-200 shadow-md rounded-md z-45">
                 <button
                   ref={editContentRef}
-                  onClick={() => task._id && editContent(task._id)}
+                  onClick={() => task._id && appContext?.modifyTask(task._id, task)}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100">
                   Edit
                 </button>
@@ -140,7 +100,7 @@ const TableRow: React.FC<{ tasks: TaskType[] }> = ({ tasks }) => {
                   <option value="Completed">Completed</option>
                 </select>
                 <button
-                  onClick={async () => task._id && (await deleteTask(task._id))}
+                  onClick={async () => task._id && (await appContext?.deleteTask(task._id))}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100">
                   Delete
                 </button>
