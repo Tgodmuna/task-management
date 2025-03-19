@@ -9,6 +9,10 @@ export interface AppContextType {
   userData: userType | null;
   tasks: TaskType[] | [];
   setTasks: React.Dispatch<React.SetStateAction<TaskType[] | []>>;
+  addTask: (newTask: TaskType) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
+  getTask: (taskId: string) => Promise<TaskType | undefined>;
+  modifyTask: (taskId: string, updatedTask: TaskType) => Promise<void>;
 }
 
 export interface userType {
@@ -43,8 +47,6 @@ export interface TaskHeaderPropType {
 }
 
 export type TaskContextType = {
-  tasks: TaskType[];
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   isTaskListDropdownOpen: boolean;
   inProgressTaskList: boolean;
   completedTaskList: boolean;

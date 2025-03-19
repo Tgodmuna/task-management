@@ -27,13 +27,74 @@ function App() {
     setIsAddTaskOpen(!isAddTaskOpen);
   };
 
-  const toggleLogin = (data: boolean) => {
+  const changeLoginState = (data: boolean) => {
     console.log("called toggleLogin");
     SetIsloggedIn(data);
   };
 
-  useEffect(() => console.log({ isloggedIn }), [isloggedIn]);
+  const addTask = async (newTask: TaskType) => {
+    try {
+      const response = await axios.post(`${serverUrl}/api/task/createTask`, newTask, {
+        headers: {
+          "x-auth-token": token,
+        },
+      });
+      setTasks([...tasks, response.data.task]);
+      toast.success("Task added successfully");
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to add task. Please try again.");
+    }
+  };
 
+  const deleteTask = async (taskId: string) => {
+    try {
+      await axios.delete(`${serverUrl}/api/task/delete/${taskId}`, {
+        headers: {
+          "x-auth-token": token,
+        },
+      });
+      setTasks(tasks.filter((task) => task._id !== taskId));
+      toast.success("Task deleted successfully");
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete task. Please try again.");
+    }
+  };
+
+  
+
+  const getTask = async (taskId: string) => {
+    try {
+      const response = await axios.get(`${serverUrl}/api/task/getTask/${taskId}`, {
+        headers: {
+          "x-auth-token": token,
+        },
+      });
+      return response.data.task;
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to fetch task. Please try again.");
+    }
+  };
+
+  const modifyTask = async (taskId: string, updatedTask: TaskType) => {
+    try {
+      const response = await axios.patch(`${serverUrl}/api/task/updateTask/${taskId}`, updatedTask, {
+        headers: {
+          "x-auth-token": token,
+        },
+      });
+      setTasks(tasks.map((task) => (task._id === taskId ? response.data.task : task)));
+      toast.success("Task updated successfully");
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update task. Please try again.");
+    }
+  };
+  
+
+  //fetch tasks
   useEffect(() => {
     async function fetchTasks() {
       try {
@@ -75,12 +136,16 @@ function App() {
       value={{
         userData,
         isloggedIn,
-        toggleLogin,
+        toggleLogin: changeLoginState,
         setUserData,
         setTasks,
         tasks,
         onCreateTask,
         isAddTaskOpen,
+        addTask,
+        deleteTask,
+        getTask,
+        modifyTask,
       }}>
       <div className="App">
         <ToastContainer />
