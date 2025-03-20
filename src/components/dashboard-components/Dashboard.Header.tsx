@@ -80,22 +80,22 @@ const RightSide: React.FC<{
         {tasks &&
           tasks.map((task) => {
             return (
-              task.people &&
-              task.people.length !== 0 &&
-              task.people.map((assignee) =>
-              assignee.profileUrl ? (
-                <img
-                key={assignee.name}
-                src={assignee.profileUrl}
-                alt={`User ${assignee.name}`}
-                className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover"
-                />
-              ) : (
-                <User
-                key={assignee.name}
-                className="w-4 h-4  text-green-300"
-                />
-              )
+              task?.people &&
+              task?.people.length !== 0 &&
+              task?.people.map((assignee) =>
+                assignee.profileUrl ? (
+                  <img
+                    key={assignee?.name}
+                    src={assignee?.profileUrl}
+                    alt={`User ${assignee?.name}`}
+                    className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover"
+                  />
+                ) : (
+                  <User
+                    key={assignee.name}
+                    className="w-4 h-4  text-green-300"
+                  />
+                )
               )
             );
           })}
