@@ -10,6 +10,7 @@ const DashboardHeader = () => {
   const tasks = appContext?.tasks;
   const userData = appContext?.userData;
   const toggleAddTask = appContext?.onCreateTask;
+  const toggleInvite = appContext?.onInviteSent;
 
   return (
     <header className="flex items-center justify-between p-4 bg-white shadow-md">
@@ -27,6 +28,7 @@ const DashboardHeader = () => {
           tasks={tasks}
           userData={userData}
           toggleAddTask={toggleAddTask}
+          toggleInvite={toggleInvite}
         />
       }
     </header>
@@ -69,8 +71,9 @@ const LeftSide: React.FC<{
 const RightSide: React.FC<{
   tasks: [] | TaskType[] | undefined;
   userData: userType | null | undefined;
+  toggleInvite: (() => void) | undefined;
   toggleAddTask: (() => void) | undefined;
-}> = ({ tasks, userData, toggleAddTask }) => {
+}> = ({ tasks, userData, toggleAddTask, toggleInvite }) => {
   return (
     <div className="flex  gap-5 items-center">
       {/* Avatars & Invites */}
@@ -85,13 +88,15 @@ const RightSide: React.FC<{
               task?.people.map((assignee) =>
                 assignee.profileUrl ? (
                   <img
+                    title={'assignee'}
                     key={assignee?.name}
                     src={assignee?.profileUrl}
                     alt={`User ${assignee?.name}`}
                     className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover"
                   />
                 ) : (
-                  <User
+                    <User
+                      
                     key={assignee.name}
                     className="w-4 h-4  text-green-300"
                   />
@@ -112,7 +117,9 @@ const RightSide: React.FC<{
             <User className="w-4 h-4 text-gray-600" />
           )}
         </div>
-        <button className="bg-gray-200  text-sm px-3 py-1 rounded-md hover:bg-gray-300">
+        <button
+          onClick={() => toggleInvite && toggleInvite()}
+          className="bg-gray-200  text-sm px-3 py-1 rounded-md hover:bg-gray-300">
           Invite
         </button>
       </div>
