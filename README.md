@@ -1,4 +1,4 @@
-## About the App
+# About the App
 
 The Task Management Client is designed to help users manage their tasks efficiently. It provides features such as task creation, task modification, task deletion, and user invitations. The app is built using modern web development technologies and follows a modular architecture to ensure scalability and maintainability. Users can invite others to collaborate on tasks, track the progress of tasks, and receive notifications for important updates.
 
@@ -25,24 +25,49 @@ The application uses several design patterns to ensure code quality and maintain
 
 The project is structured as follows:
 
-```
-/dashboard-components/
+```plaintext
+/public/
+    - _redirects
+    - favicon.ico
+    - index.html
+    - logo192.png
+    - logo512.png
+    - manifest.json
+    - robots.txt
+/src/
+    - App.css
+    - App.test.tsx
+    - App.tsx
+    - index.css
+    - index.tsx
+    - react-app-env.d.ts
+    - reportWebVitals.ts
+    - setupTests.ts
+    - types.ts
     /components/
-        - TaskList.tsx
-        - TaskItem.tsx
-        - UserInvite.tsx
-    /hooks/
-        - useTasks.ts
-        - useUserInvite.ts
-    /context/
-        - TaskContext.tsx
-        - UserContext.tsx
+        /auth/
+            - Authenticator.tsx
+            - Login.tsx
+            - Register.tsx
+        /dashboard-components/
+            - Dashboard.Header.tsx
+            - Dashboard.tsx
+        /hooks/
+            - UseEnvironmentVar.ts
+            - UseFetchToken.ts
+            - UseFetchUser.tsx
+        /taskComponents/
+            - Task_Details.tsx
+            - Task_input.tsx
+            - Task_List.tsx
+            - Task.tsx
+            - TaskHeader.tsx
+            - TaskTableHead.tsx
+            - TaskTableRow.tsx
+            - UserAvatar.tsx
     /pages/
-        - Dashboard.tsx
-        - TaskDetails.tsx
-    /utilities/
-        - api.ts
-        - constants.ts
+        - EditComponent.tsx
+        - Invitation.tsx
 ```
 
 - **Components**: Contains all the reusable UI components.
