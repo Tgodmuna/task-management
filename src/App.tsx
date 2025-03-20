@@ -19,12 +19,18 @@ function App() {
   const [userData, setUserData] = useState<null | userType>(UseFetchUserData());
   const [tasks, setTasks] = useState<TaskType[] | []>([]);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const [isInvite, setIsInvite] = useState<boolean>(false);
   const { serverUrl } = useEnvironmentUrls();
   const token = UseFetchToken();
 
-  //create task toggle function
+  // task toggle function
   const onCreateTask = () => {
     setIsAddTaskOpen(!isAddTaskOpen);
+  };
+
+  //close useInvitaion
+  const onInviteSent: () => void = () => {
+    setIsInvite(!isInvite);
   };
 
   const changeLoginState = (data: boolean) => {
@@ -62,8 +68,6 @@ function App() {
     }
   };
 
-  
-
   const getTask = async (taskId: string) => {
     try {
       const response = await axios.get(`${serverUrl}/api/task/getTask/${taskId}`, {
@@ -80,11 +84,15 @@ function App() {
 
   const modifyTask = async (taskId: string, updatedTask: TaskType) => {
     try {
-      const response = await axios.patch(`${serverUrl}/api/task/updateTask/${taskId}`, updatedTask, {
-        headers: {
-          "x-auth-token": token,
-        },
-      });
+      const response = await axios.patch(
+        `${serverUrl}/api/task/updateTask/${taskId}`,
+        updatedTask,
+        {
+          headers: {
+            "x-auth-token": token,
+          },
+        }
+      );
       setTasks(tasks.map((task) => (task._id === taskId ? response.data.task : task)));
       toast.success("Task updated successfully");
     } catch (err) {
@@ -92,7 +100,6 @@ function App() {
       toast.error("Failed to update task. Please try again.");
     }
   };
-  
 
   //fetch tasks
   useEffect(() => {
@@ -133,7 +140,9 @@ function App() {
 
   return (
     <AppContext.Provider
-      value={{
+      value={ {
+        isInvite,
+        onInviteSent,
         userData,
         isloggedIn,
         toggleLogin: changeLoginState,
