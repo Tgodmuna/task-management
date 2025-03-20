@@ -11,11 +11,11 @@ const TaskList: React.FC = () => {
 
   // Filter tasks by status
   const inProgressTasks = useMemo(
-    () => tasks && tasks.filter((task) => task.status?.toLowerCase() === "in progress"),
+    () => tasks && tasks.filter((task) => task?.status?.toLowerCase() === "in progress"),
     [tasks]
   );
   const completedTasks = useMemo(
-    () => tasks && tasks.filter((task) => task.status?.toLowerCase() === "completed"),
+    () => tasks && tasks.filter((task) => task?.status?.toLowerCase() === "completed"),
     [tasks]
   );
 
@@ -47,7 +47,7 @@ const TaskList: React.FC = () => {
     <div className={`space-y-6 flex bg-yellow-100 p-2 flex-col`}>
       {/* todo tasks */}
       {tasks && tasks.length > 0 && (
-        <div className={`w-full`}>
+        <div className={`w-full  z-10`}>
           <TaskHeader
             title={"todo"}
             dropdownContext={taskContext?.isTaskListDropdownOpen ?? false}
@@ -57,8 +57,8 @@ const TaskList: React.FC = () => {
           <div
             className={`${
               taskContext?.isTaskListDropdownOpen ? "h-full p-4  transition-all duration-500" : ""
-            }h-0 p-0 transition-all overflow-hidden duration-500  bg-white  rounded-lg shadow-md w-full `}>
-            <table className="w-full border-collapse">
+            }h-0 p-0 transition-all overflow-hidden duration-500 z-10  bg-white  rounded-lg shadow-md w-full `}>
+            <table className="w-full z-10 overflow-x-hidden border-collapse">
               <TableHeader />
               <TableRow tasks={tasks} />
             </table>
@@ -101,7 +101,7 @@ const TaskList: React.FC = () => {
           <div
             className={`${
               taskContext?.completedTaskList ? "h-full p-4  transition-all duration-500" : ""
-            }h-0 p-0 transition-all overflow-hidden duration-500  bg-white  rounded-lg shadow-md w-full  `}>
+            }h-0 p-0 transition-all overflow-hidden duration-500  bg-white  rounded-lg shadow-md w-full z-10  `}>
             <table className={"w-full border-collapse"}>
               <TableHeader />
               <TableRow tasks={completedTasks} />
