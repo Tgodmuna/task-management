@@ -13,6 +13,8 @@ export interface AppContextType {
   deleteTask: (taskId: string) => Promise<void>;
   getTask: (taskId: string) => Promise<TaskType | undefined>;
   modifyTask: (taskId: string, updatedTask: TaskType) => Promise<void>;
+  onInviteSent: () => void;
+  isInvite: boolean;
 }
 
 export interface userType {
