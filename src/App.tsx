@@ -111,8 +111,7 @@ function App() {
           },
         });
         if (response.status === 401) {
-          console.log("access denied, no token provided");
-          toast.error(response.data);
+          console.log("access denied, no token provided or not logged in");
           return;
         }
 
